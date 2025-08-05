@@ -1,12 +1,27 @@
-import { Router } from "express";
+import { IRouter, Router } from "express";
 import { UserRoutes } from "../modules/user/user.route";
+import { AuthRoutes } from "../modules/auth/auth.route";
+import { DriverRoutes } from "../modules/driver/driver.route";
+
+interface IModuleRoute {
+  path: string;
+  route: IRouter;
+}
 
 export const router = Router();
 
-const moduleRoutes = [
+const moduleRoutes: IModuleRoute[] = [
   {
     path: "/user",
     route: UserRoutes,
+  },
+  {
+    path: "/auth",
+    route: AuthRoutes,
+  },
+  {
+    path: "/driver",
+    route: DriverRoutes,
   },
 ];
 

@@ -4,12 +4,19 @@ import httpStatus from "http-status-codes";
 import { verifyToken } from "../utils/jwt";
 import { envVars } from "../config/env";
 import { JwtPayload } from "jsonwebtoken";
+import { Role } from "../modules/user/user.interface";
 
 export const checkAuth =
-  (...authRoles: string[]) =>
+  (...authRoles: Role[]) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const accessToken = req.headers.authorization;
+      let whiteListedRoles = [Role.SUPER_ADMIN];
+
+      if (authRoles?.length) {
+        whiteListedRoles = [...whiteListedRoles, ...authRoles];
+      }
+
+      const accessToken = req.cookies.accessToken;
 
       if (!accessToken) {
         throw new AppError(httpStatus.UNAUTHORIZED, "No Token Found");
@@ -20,7 +27,7 @@ export const checkAuth =
         envVars.JWT_ACCESS_SECRET
       ) as JwtPayload;
 
-      if (!authRoles.includes(verifiedToken.role)) {
+      if (!whiteListedRoles.includes(verifiedToken.role)) {
         throw new AppError(
           httpStatus.UNAUTHORIZED,
           "You are not permitted to view this"
