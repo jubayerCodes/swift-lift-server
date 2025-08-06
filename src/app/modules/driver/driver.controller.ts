@@ -18,6 +18,29 @@ const driverRequest = catchAsync(
   }
 );
 
+const updateDriver = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (req: Request, res: Response, next: NextFunction) => {
+    const driverId = req.params.id;
+    const payload = req.body;
+    const decoded = req.user;
+
+    const updatedDriver = await DriverServices.updateDriver(
+      driverId,
+      payload,
+      decoded
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: "Driver Updated Successfully",
+      data: updatedDriver,
+    });
+  }
+);
+
 export const DriverControllers = {
   driverRequest,
+  updateDriver,
 };

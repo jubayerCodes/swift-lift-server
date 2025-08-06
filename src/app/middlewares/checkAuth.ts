@@ -10,12 +10,6 @@ export const checkAuth =
   (...authRoles: Role[]) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      let whiteListedRoles = [Role.SUPER_ADMIN];
-
-      if (authRoles?.length) {
-        whiteListedRoles = [...whiteListedRoles, ...authRoles];
-      }
-
       const accessToken = req.cookies.accessToken;
 
       if (!accessToken) {
@@ -27,7 +21,7 @@ export const checkAuth =
         envVars.JWT_ACCESS_SECRET
       ) as JwtPayload;
 
-      if (!whiteListedRoles.includes(verifiedToken.role)) {
+      if (!authRoles.includes(verifiedToken.role)) {
         throw new AppError(
           httpStatus.UNAUTHORIZED,
           "You are not permitted to view this"

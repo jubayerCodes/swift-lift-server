@@ -47,7 +47,6 @@ const updateUser = async (
   }
 
   if (payload.role) {
-    console.log(payload.role, decodedToken.role);
     if (
       decodedToken.role !== Role.SUPER_ADMIN &&
       decodedToken.role !== Role.ADMIN

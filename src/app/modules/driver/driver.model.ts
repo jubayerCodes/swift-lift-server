@@ -1,6 +1,7 @@
 import { model, Schema } from "mongoose";
 import {
   ApprovalStatus,
+  Available,
   IDriver,
   IVehicle,
   VehicleType,
@@ -27,7 +28,12 @@ export const driveSchema = new Schema<IDriver>(
       default: ApprovalStatus.PENDING,
       required: true,
     },
-    available: { type: Boolean, default: true, required: true },
+    available: {
+      type: String,
+      enum: Object.values(Available),
+      default: Available.ONLINE,
+      required: true,
+    },
     vehicleInfo: vehicleInfoSchema,
   },
   {

@@ -1,5 +1,5 @@
 import z from "zod";
-import { VehicleType } from "./driver.interface";
+import { ApprovalStatus, Available, VehicleType } from "./driver.interface";
 
 export const driverRequestZodSchema = z.object({
   userId: z.string(),
@@ -8,4 +8,16 @@ export const driverRequestZodSchema = z.object({
     model: z.string(),
     builtYear: z.string(),
   }),
+});
+
+export const updateDriverZodSchema = z.object({
+  approvalStatus: z.enum(Object.values(ApprovalStatus)).optional(),
+  available: z.enum(Object.values(Available)).optional(),
+  vehicleInfo: z
+    .object({
+      type: z.enum(Object.values(VehicleType)),
+      model: z.string(),
+      builtYear: z.string(),
+    })
+    .optional(),
 });

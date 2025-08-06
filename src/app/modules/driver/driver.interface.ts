@@ -17,10 +17,15 @@ export enum ApprovalStatus {
   SUSPENDED = "SUSPENDED",
 }
 
+export enum Available {
+  ONLINE = "ONLINE",
+  OFFLINE = "OFFLINE",
+}
+
 export interface IDriver {
   _id?: Types.ObjectId;
   userId: Types.ObjectId;
   approvalStatus: ApprovalStatus;
-  available: boolean;
+  available: Available;
   vehicleInfo: IVehicle;
 }
