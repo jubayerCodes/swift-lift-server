@@ -21,7 +21,7 @@ const vehicleInfoSchema = new Schema<IVehicle>(
 
 export const driveSchema = new Schema<IDriver>(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User" },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     approvalStatus: {
       type: String,
       enum: Object.values(ApprovalStatus),

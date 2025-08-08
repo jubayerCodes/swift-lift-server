@@ -12,7 +12,7 @@ export const router = Router();
 
 const moduleRoutes: IModuleRoute[] = [
   {
-    path: "/user",
+    path: "/users",
     route: UserRoutes,
   },
   {
@@ -20,7 +20,7 @@ const moduleRoutes: IModuleRoute[] = [
     route: AuthRoutes,
   },
   {
-    path: "/driver",
+    path: "/drivers",
     route: DriverRoutes,
   },
 ];
