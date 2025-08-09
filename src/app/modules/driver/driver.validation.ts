@@ -8,6 +8,10 @@ export const driverRequestZodSchema = z.object({
     model: z.string(),
     builtYear: z.string(),
   }),
+  location: z.object({
+    latitude: z.number(),
+    longitude: z.number(),
+  }),
 });
 
 export const updateDriverZodSchema = z.object({
@@ -18,6 +22,12 @@ export const updateDriverZodSchema = z.object({
       type: z.enum(Object.values(VehicleType)),
       model: z.string(),
       builtYear: z.string(),
+    })
+    .optional(),
+  location: z
+    .object({
+      latitude: z.number(),
+      longitude: z.number(),
     })
     .optional(),
 });

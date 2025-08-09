@@ -1,9 +1,10 @@
 import { JwtPayload } from "jsonwebtoken";
 import AppError from "../../errorHelpers/AppError";
-import { IDriver } from "./driver.interface";
+import { ApprovalStatus, IDriver } from "./driver.interface";
 import { Driver } from "./driver.model";
 import httpStatus from "http-status-codes";
 import { Role } from "../user/user.interface";
+import { User } from "../user/user.model";
 
 const driverRequest = async (payload: Partial<IDriver>) => {
   const { userId } = payload;
@@ -40,7 +41,8 @@ const updateDriver = async (
 
   if (
     payload.approvalStatus &&
-    (decodedToken.role !== Role.ADMIN || decodedToken.role !== Role.SUPER_ADMIN)
+    decodedToken.role !== Role.ADMIN &&
+    decodedToken.role !== Role.SUPER_ADMIN
   ) {
     throw new AppError(httpStatus.FORBIDDEN, "You are not authorized");
   }
@@ -52,7 +54,33 @@ const updateDriver = async (
   return newUpdatedDriver;
 };
 
+const approveDriver = async (userId: string) => {
+  const existingUser = await User.findById(userId);
+
+  if (!existingUser) {
+    throw new AppError(httpStatus.NOT_FOUND, "User Not Exist");
+  }
+
+  await User.findByIdAndUpdate(userId, {
+    role: Role.DRIVER,
+  });
+
+  const existingDriver = await Driver.findOne({ userId });
+
+  if (!existingDriver) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Driver Not Exist");
+  }
+
+  await Driver.updateOne(
+    { userId },
+    { $set: { approvalStatus: ApprovalStatus.APPROVED } }
+  );
+
+  return true;
+};
+
 export const DriverServices = {
   driverRequest,
   updateDriver,
+  approveDriver,
 };

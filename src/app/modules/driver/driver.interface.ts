@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { ILocation } from "../ride/ride.interface";
 
 export enum VehicleType {
   BIKE = "BIKE",
@@ -28,4 +29,5 @@ export interface IDriver {
   approvalStatus: ApprovalStatus;
   available: Available;
   vehicleInfo: IVehicle;
+  location: ILocation;
 }

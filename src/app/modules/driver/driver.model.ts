@@ -6,6 +6,7 @@ import {
   IVehicle,
   VehicleType,
 } from "./driver.interface";
+import { locationSchema } from "../ride/ride.model";
 
 const vehicleInfoSchema = new Schema<IVehicle>(
   {
@@ -35,6 +36,7 @@ export const driveSchema = new Schema<IDriver>(
       required: true,
     },
     vehicleInfo: vehicleInfoSchema,
+    location: locationSchema,
   },
   {
     versionKey: false,
