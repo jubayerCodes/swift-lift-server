@@ -90,7 +90,36 @@ const updateUser = async (
   return newUpdatedUser;
 };
 
+const blockUser = async (userId: string, payload: Pick<IUser, "isActive">) => {
+  const existingUser = await User.findById(userId);
+
+  if (!existingUser) {
+    throw new AppError(httpStatus.NOT_FOUND, "User Not Exist");
+  }
+
+  await User.findByIdAndUpdate(userId, { isActive: payload?.isActive });
+
+  return true;
+};
+
+const deleteUser = async (
+  userId: string,
+  payload: Pick<IUser, "isDeleted">
+) => {
+  const existingUser = await User.findById(userId);
+
+  if (!existingUser) {
+    throw new AppError(httpStatus.NOT_FOUND, "User Not Exist");
+  }
+
+  await User.findByIdAndUpdate(userId, { isDeleted: payload?.isDeleted });
+
+  return true;
+};
+
 export const UserServices = {
   createUser,
   updateUser,
+  blockUser,
+  deleteUser,
 };

@@ -35,7 +35,43 @@ const updateUser = catchAsync(
   }
 );
 
+const blockUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.params.id;
+    const payload = req.body;
+
+    await UserServices.blockUser(userId, payload);
+
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: "User Active Status Updated",
+      data: null,
+    });
+  }
+);
+
+const deleteUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.params.id;
+    const payload = req.body;
+
+    await UserServices.deleteUser(userId, payload);
+
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: `User ${
+        payload?.isDeleted ? "Deleted" : "Recovered"
+      } Successfully`,
+      data: null,
+    });
+  }
+);
+
 export const UserControllers = {
   createUser,
   updateUser,
+  blockUser,
+  deleteUser,
 };

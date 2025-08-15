@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { ILocation, IRide } from "./ride.interface";
+import { ILocation, IRide, IRideStatus } from "./ride.interface";
 
 export const locationSchema = new Schema<ILocation>(
   {
@@ -16,6 +16,12 @@ export const rideSchema = new Schema<IRide>(
     pickup: locationSchema,
     destination: locationSchema,
     cost: { type: Number, required: true },
+    status: {
+      type: String,
+      enum: Object.values(IRideStatus),
+      required: true,
+      default: IRideStatus.REQUESTED,
+    },
   },
   {
     versionKey: false,

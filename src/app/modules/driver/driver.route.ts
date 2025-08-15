@@ -27,5 +27,6 @@ DriverRoutes.patch(
 DriverRoutes.patch(
   "/approve/:id",
   checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
-  DriverControllers.approveDriver
+  validateRequest(updateDriverZodSchema),
+  DriverControllers.updateApproval
 );

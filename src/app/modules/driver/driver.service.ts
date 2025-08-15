@@ -54,17 +54,22 @@ const updateDriver = async (
   return newUpdatedDriver;
 };
 
-const approveDriver = async (userId: string) => {
+const updateApproval = async (
+  userId: string,
+  payload: Pick<IDriver, "approvalStatus">
+) => {
   const existingUser = await User.findById(userId);
 
   if (!existingUser) {
     throw new AppError(httpStatus.NOT_FOUND, "User Not Exist");
   }
 
-  await User.findByIdAndUpdate(userId, {
-    role: Role.DRIVER,
-  });
-
+  if (payload?.approvalStatus === ApprovalStatus.APPROVED) {
+    await User.findByIdAndUpdate(userId, {
+      role: Role.DRIVER,
+    });
+  }
+  
   const existingDriver = await Driver.findOne({ userId });
 
   if (!existingDriver) {
@@ -73,7 +78,7 @@ const approveDriver = async (userId: string) => {
 
   await Driver.updateOne(
     { userId },
-    { $set: { approvalStatus: ApprovalStatus.APPROVED } }
+    { $set: { approvalStatus: payload?.approvalStatus } }
   );
 
   return true;
@@ -82,5 +87,5 @@ const approveDriver = async (userId: string) => {
 export const DriverServices = {
   driverRequest,
   updateDriver,
-  approveDriver,
+  updateApproval,
 };

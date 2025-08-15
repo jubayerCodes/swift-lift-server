@@ -30,4 +30,5 @@ export interface IDriver {
   available: Available;
   vehicleInfo: IVehicle;
   location: ILocation;
+  onRide: boolean;
 }

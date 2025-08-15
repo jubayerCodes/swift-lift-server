@@ -37,6 +37,7 @@ export const driveSchema = new Schema<IDriver>(
     },
     vehicleInfo: vehicleInfoSchema,
     location: locationSchema,
+    onRide: { type: Boolean, required: true, default: false },
   },
   {
     versionKey: false,

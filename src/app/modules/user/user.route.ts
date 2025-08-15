@@ -19,3 +19,17 @@ UserRoutes.patch(
   validateRequest(updateUserZodSchema),
   UserControllers.updateUser
 );
+
+UserRoutes.patch(
+  "/block/:id",
+  checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
+  validateRequest(updateUserZodSchema),
+  UserControllers.blockUser
+);
+
+UserRoutes.delete(
+  "/:id",
+  checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
+  validateRequest(updateUserZodSchema),
+  UserControllers.deleteUser
+);
