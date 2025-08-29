@@ -69,7 +69,7 @@ const updateApproval = async (
       role: Role.DRIVER,
     });
   }
-  
+
   const existingDriver = await Driver.findOne({ userId });
 
   if (!existingDriver) {

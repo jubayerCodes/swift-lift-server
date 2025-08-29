@@ -1,33 +1,43 @@
 import AppError from "../../errorHelpers/AppError";
-import { Driver } from "../driver/driver.model";
 import { IRide, IRideStatus } from "./ride.interface";
 import httpStatus from "http-status-codes";
 import { Ride } from "./ride.model";
+import { calculateCost, findNearestDriver } from "./ride.utils";
+import { Driver } from "../driver/driver.model";
 
-const requestRide = async (payload: IRide) => {
-  const { driverId } = payload;
+const requestRide = async (
+  payload: Omit<IRide, "driverId" | "cost" | "status">
+) => {
+  const previousRide = await Ride.findOne({ riderId: payload.riderId }).sort({
+    createdAt: -1,
+  });
 
-  const previousRide = await Ride.findOne({ riderId: payload?.riderId });
-
-  const driver = await Driver.findById(driverId);
-
-  const driverOnRide = driver?.onRide;
-
-  if (driverOnRide) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Driver Already on a Ride");
+  if (
+    previousRide &&
+    ![IRideStatus.COMPLETED, IRideStatus.CANCELLED].includes(
+      previousRide.status
+    )
+  ) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Rider already on a ride");
   }
 
-  if (previousRide) {
-    if (
-      ![IRideStatus.COMPLETED, IRideStatus.CANCELLED].includes(
-        previousRide?.status as IRideStatus
-      )
-    ) {
-      throw new AppError(httpStatus.BAD_REQUEST, "Rider Already on a Ride");
-    }
-  }
+  // Find nearest driver
+  const { driver } = await findNearestDriver(payload.pickup);
 
-  const requestedRide = await Ride.create(payload);
+  // Calculate cost
+  const cost = calculateCost(payload.pickup, payload.destination);
+
+  // Create ride
+  const requestedRide = await Ride.create({
+    ...payload,
+    driverId: driver._id,
+    cost,
+    status: IRideStatus.REQUESTED,
+  });
+
+  // Mark driver as busy
+  driver.onRide = true;
+  await driver.save();
 
   return requestedRide;
 };
@@ -52,6 +62,8 @@ const cancelRide = async (rideId: string) => {
     { status: IRideStatus.CANCELLED },
     { new: true }
   );
+
+  await Driver.findByIdAndUpdate(existingRide.driverId, { onRide: false });
 
   return updatedRide;
 };
