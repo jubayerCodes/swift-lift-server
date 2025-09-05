@@ -2,7 +2,7 @@ import { Router } from "express";
 import { checkAuth } from "../../middlewares/checkAuth";
 import { Role } from "../user/user.interface";
 import { validateRequest } from "../../middlewares/validateRequest";
-import { requestRideZodSchema } from "./ride.validation";
+import { acceptRideZodSchema, requestRideZodSchema } from "./ride.validation";
 import { RideControllers } from "./ride.controller";
 
 export const RideRoutes = Router();
@@ -23,5 +23,6 @@ RideRoutes.patch(
 RideRoutes.patch(
   "/accept/:rideId",
   checkAuth(Role.DRIVER),
+  validateRequest(acceptRideZodSchema),
   RideControllers.acceptRide
 );

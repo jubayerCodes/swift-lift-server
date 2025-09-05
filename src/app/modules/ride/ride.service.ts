@@ -4,10 +4,16 @@ import httpStatus from "http-status-codes";
 import { Ride } from "./ride.model";
 import { calculateCost, findNearestDriver } from "./ride.utils";
 import { Driver } from "../driver/driver.model";
+import { JwtPayload } from "jsonwebtoken";
 
 const requestRide = async (
-  payload: Omit<IRide, "driverId" | "cost" | "status">
+  payload: Omit<IRide, "driverId" | "cost" | "status">,
+  decodedToken: JwtPayload
 ) => {
+  if (payload.riderId.toString() !== decodedToken.userId) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "UNAUTHORIZED");
+  }
+
   const previousRide = await Ride.findOne({ riderId: payload.riderId }).sort({
     createdAt: -1,
   });
@@ -35,7 +41,6 @@ const requestRide = async (
     status: IRideStatus.REQUESTED,
   });
 
-  // Mark driver as busy
   driver.onRide = true;
   await driver.save();
 
@@ -68,7 +73,13 @@ const cancelRide = async (rideId: string) => {
   return updatedRide;
 };
 
-const acceptRide = async (rideId: string, payload: {driverId: string}) => {
+const acceptRide = async (
+  rideId: string,
+  payload: {
+    driverId: string;
+    status: IRideStatus.ACCEPTED | IRideStatus.CANCELLED;
+  }
+) => {
   const existingRide = await Ride.findById(rideId);
 
   if (!existingRide) {
@@ -82,12 +93,15 @@ const acceptRide = async (rideId: string, payload: {driverId: string}) => {
   }
 
   if (existingRide.status !== IRideStatus.REQUESTED) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Ride Cannot Be Accepted Now");
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Ride Cannot Be ${payload.status} Now`
+    );
   }
 
   const updatedRide = await Ride.findByIdAndUpdate(
     rideId,
-    { status: IRideStatus.ACCEPTED },
+    { status: payload.status },
     { new: true }
   );
 

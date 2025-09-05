@@ -9,7 +9,7 @@ const requestRide = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const payload = req.body;
 
-    const requestedRide = await RideServices.requestRide(payload);
+    const requestedRide = await RideServices.requestRide(payload, req.user);
 
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
