@@ -16,6 +16,12 @@ RideRoutes.post(
 
 RideRoutes.patch(
   "/cancel/:id",
-  checkAuth(Role.SUPER_ADMIN, Role.RIDER),
+  checkAuth(Role.ADMIN, Role.RIDER),
   RideControllers.cancelRide
+);
+
+RideRoutes.patch(
+  "/accept/:rideId",
+  checkAuth(Role.DRIVER),
+  RideControllers.acceptRide
 );

@@ -19,14 +19,14 @@ DriverRoutes.post(
 
 DriverRoutes.patch(
   "/:id",
-  checkAuth(Role.SUPER_ADMIN, Role.ADMIN, Role.DRIVER),
+  checkAuth(Role.ADMIN, Role.ADMIN, Role.DRIVER),
   validateRequest(updateDriverZodSchema),
   DriverControllers.updateDriver
 );
 
 DriverRoutes.patch(
   "/approve/:id",
-  checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
+  checkAuth(Role.ADMIN, Role.ADMIN),
   validateRequest(updateDriverZodSchema),
   DriverControllers.updateApproval
 );

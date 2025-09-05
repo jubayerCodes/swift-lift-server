@@ -68,7 +68,34 @@ const cancelRide = async (rideId: string) => {
   return updatedRide;
 };
 
+const acceptRide = async (rideId: string, payload: {driverId: string}) => {
+  const existingRide = await Ride.findById(rideId);
+
+  if (!existingRide) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Ride Not Exist");
+  }
+  if (existingRide.driverId.toString() !== payload.driverId) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "Your Are Not Permitted To Accept"
+    );
+  }
+
+  if (existingRide.status !== IRideStatus.REQUESTED) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Ride Cannot Be Accepted Now");
+  }
+
+  const updatedRide = await Ride.findByIdAndUpdate(
+    rideId,
+    { status: IRideStatus.ACCEPTED },
+    { new: true }
+  );
+
+  return updatedRide;
+};
+
 export const RideServices = {
   requestRide,
   cancelRide,
+  acceptRide,
 };
