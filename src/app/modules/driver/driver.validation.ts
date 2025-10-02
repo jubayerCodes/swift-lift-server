@@ -14,9 +14,13 @@ export const driverRequestZodSchema = z.object({
   }),
 });
 
+export const availableSchema = z.object({
+  available: z.enum(Object.values(Available)).optional(),
+});
+
 export const updateDriverZodSchema = z.object({
   approvalStatus: z.enum(Object.values(ApprovalStatus)).optional(),
-  available: z.enum(Object.values(Available)).optional(),
+  available: availableSchema,
   vehicleInfo: z
     .object({
       type: z.enum(Object.values(VehicleType)),

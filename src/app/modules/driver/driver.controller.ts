@@ -56,8 +56,40 @@ const updateApproval = catchAsync(
   }
 );
 
+const updateAvailability = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (req: Request, res: Response, next: NextFunction) => {
+    const driverId = req.params.id;
+
+    await DriverServices.updateAvailability(driverId, req.body, req.user);
+
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: `Driver Availability Updated Successfully`,
+      data: null,
+    });
+  }
+);
+
+const getAllDrivers = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (req: Request, res: Response, next: NextFunction) => {
+    const allDrivers = await DriverServices.getAllDrivers();
+
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: `All Drivers Retrieved Successfully`,
+      data: allDrivers,
+    });
+  }
+);
+
 export const DriverControllers = {
   driverRequest,
   updateDriver,
   updateApproval,
+  updateAvailability,
+  getAllDrivers,
 };

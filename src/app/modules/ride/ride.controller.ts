@@ -22,7 +22,7 @@ const requestRide = catchAsync(
 
 const cancelRide = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const updatedRide = await RideServices.cancelRide(req.params.id);
+    const updatedRide = await RideServices.cancelRide(req.params.id, req.user);
 
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
@@ -37,7 +37,8 @@ const acceptRide = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const updatedRide = await RideServices.acceptRide(
       req.params.rideId,
-      req.body
+      req.body,
+      req.user
     );
 
     sendResponse(res, {
@@ -49,8 +50,40 @@ const acceptRide = catchAsync(
   }
 );
 
+const updateRideStatus = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const updatedRide = await RideServices.updateRideStatus(
+      req.params.rideId,
+      req.body,
+      req.user
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      data: updatedRide,
+      message: "Ride Status Updated Successfully",
+      success: true,
+    });
+  }
+);
+
+const getAllRides = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const allRides = await RideServices.getAllRides();
+
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: `All Rides Retrieved Successfully`,
+      data: allRides,
+    });
+  }
+);
+
 export const RideControllers = {
   requestRide,
   cancelRide,
   acceptRide,
+  updateRideStatus,
+  getAllRides,
 };

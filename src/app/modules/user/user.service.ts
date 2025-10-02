@@ -117,9 +117,16 @@ const deleteUser = async (
   return true;
 };
 
+const getAllUsers = async () => {
+  const allUsers = await User.find();
+
+  return allUsers;
+};
+
 export const UserServices = {
   createUser,
   updateUser,
   blockUser,
   deleteUser,
+  getAllUsers,
 };

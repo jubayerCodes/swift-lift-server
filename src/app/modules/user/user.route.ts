@@ -33,3 +33,9 @@ UserRoutes.delete(
   validateRequest(updateUserZodSchema),
   UserControllers.deleteUser
 );
+
+UserRoutes.get(
+  "/",
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  UserControllers.getAllUsers
+);

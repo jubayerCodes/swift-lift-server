@@ -84,8 +84,41 @@ const updateApproval = async (
   return true;
 };
 
+const updateAvailability = async (
+  driverId: string,
+  payload: Pick<IDriver, "available">,
+  user: JwtPayload
+) => {
+  const existingDriver = await Driver.findById(driverId);
+
+  if (
+    user?.role === Role.DRIVER &&
+    user?.userId !== existingDriver?.userId?.toString()
+  ) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "Your Are Not Permitted To View This"
+    );
+  }
+  if (!existingDriver) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Driver Not Exist");
+  }
+
+  await Driver.findByIdAndUpdate(driverId, { available: payload.available });
+
+  return true;
+};
+
+const getAllDrivers = async () => {
+  const allDrivers = await Driver.find();
+
+  return allDrivers;
+};
+
 export const DriverServices = {
   driverRequest,
   updateDriver,
   updateApproval,
+  updateAvailability,
+  getAllDrivers,
 };

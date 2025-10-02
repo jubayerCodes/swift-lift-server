@@ -69,9 +69,23 @@ const deleteUser = catchAsync(
   }
 );
 
+const getAllUsers = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const allUsers = await UserServices.getAllUsers();
+
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: `All Users Retrieved Successfully`,
+      data: allUsers,
+    });
+  }
+);
+
 export const UserControllers = {
   createUser,
   updateUser,
   blockUser,
   deleteUser,
+  getAllUsers,
 };

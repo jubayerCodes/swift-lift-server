@@ -17,3 +17,8 @@ export const acceptRideZodSchema = z.object({
   driverId: z.string(),
   status: z.enum([IRideStatus.ACCEPTED, IRideStatus.CANCELLED]),
 });
+
+export const updateRideStatusZodSchema = z.object({
+  driverId: z.string(),
+  status: z.enum(Object.values(IRideStatus)),
+});

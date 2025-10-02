@@ -27,16 +27,13 @@ const requestRide = async (
     throw new AppError(httpStatus.BAD_REQUEST, "Rider already on a ride");
   }
 
-  // Find nearest driver
   const { driver } = await findNearestDriver(payload.pickup);
 
-  // Calculate cost
   const cost = calculateCost(payload.pickup, payload.destination);
 
-  // Create ride
   const requestedRide = await Ride.create({
     ...payload,
-    driverId: driver._id,
+    driverId: driver?.userId,
     cost,
     status: IRideStatus.REQUESTED,
   });
@@ -47,11 +44,18 @@ const requestRide = async (
   return requestedRide;
 };
 
-const cancelRide = async (rideId: string) => {
+const cancelRide = async (rideId: string, decodedToken: JwtPayload) => {
   const existingRide = await Ride.findById(rideId);
 
   if (!existingRide) {
     throw new AppError(httpStatus.BAD_REQUEST, "Ride Not Exist");
+  }
+
+  if (existingRide.driverId.toString() !== decodedToken.userId) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "Your Are Not Permitted To Cancel"
+    );
   }
 
   if ([IRideStatus.CANCELLED].includes(existingRide.status)) {
@@ -76,16 +80,16 @@ const cancelRide = async (rideId: string) => {
 const acceptRide = async (
   rideId: string,
   payload: {
-    driverId: string;
     status: IRideStatus.ACCEPTED | IRideStatus.CANCELLED;
-  }
+  },
+  decodedToken: JwtPayload
 ) => {
   const existingRide = await Ride.findById(rideId);
 
   if (!existingRide) {
     throw new AppError(httpStatus.BAD_REQUEST, "Ride Not Exist");
   }
-  if (existingRide.driverId.toString() !== payload.driverId) {
+  if (existingRide.driverId.toString() !== decodedToken.userId) {
     throw new AppError(
       httpStatus.UNAUTHORIZED,
       "Your Are Not Permitted To Accept"
@@ -108,8 +112,54 @@ const acceptRide = async (
   return updatedRide;
 };
 
+const updateRideStatus = async (
+  rideId: string,
+  payload: {
+    status: IRideStatus;
+  },
+  decodedToken: JwtPayload
+) => {
+  const existingRide = await Ride.findById(rideId);
+
+  if (!existingRide) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Ride Not Exist");
+  }
+  if (existingRide.driverId.toString() !== decodedToken.userId) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "Your Are Not Permitted To Update Status"
+    );
+  }
+
+  if (
+    existingRide.status === IRideStatus.COMPLETED ||
+    existingRide.status === IRideStatus.CANCELLED
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Ride Status Cannot Be Updated Now`
+    );
+  }
+
+  const updatedRide = await Ride.findByIdAndUpdate(
+    rideId,
+    { status: payload.status },
+    { new: true }
+  );
+
+  return updatedRide;
+};
+
+const getAllRides = async () => {
+  const allRides = await Ride.find();
+
+  return allRides;
+};
+
 export const RideServices = {
   requestRide,
   cancelRide,
   acceptRide,
+  updateRideStatus,
+  getAllRides,
 };
